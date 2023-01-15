@@ -56,11 +56,43 @@ def print_edges_of_curve(k : int, m : int) -> None:
         plt.plot([pt1[0],pt2[0]],[pt1[1],pt2[1]], marker='*', color='r', ls='none')
         plt.show()
 
+from sympy import *
+#from sympy.abc import x,y
+from scipy import *
+from numpy import *
+
+def find_int(x : float, p: Polynomial, y: float, k:int)-> float:
+    m=p.degree()
+    return x**(m+k+2)*p(y)-y**(m+k+2)*p(y)
+
+def find_traps_for_params(p : Polynomial, k: int):
+    m=p.degree()
+    ys=linspace(0,1,num=1000)
+    xs=linspace(0,1, num=(m+k+2))
+    for y in ys:
+        sols = optimize.fsolve(find_int, xs, args=(p,y,k))
+        unqiue_sols=unique(sols.round(decimals=5))
+        potential_roots = filter(is_root_in_range, unqiue_sols)
+        for x in potential_roots:
+            yield x,y
+
+#TODO: Add filter for non-trivial points
+#TODO: Add filter for non-diagonal points
+#TODO: Iterate k
+#TODO: Iterate p
+#TODO: Add test for size
 
 def main():
+    #p(y)/p(x)=(y/x)^(m+k+2) => x^(m+k+2)*p(y)-y^(m+k+2)*p(x)=0
     #print_new_roots(a=1.0/np.pi, k = 2, m=8)
-    print_edges_of_curve(k=1, m = 8)
+    #print_edges_of_curve(k=1, m = 8)
     #plot_g_around_zero(k=1, m = 8)
+    p=Polynomial([1,1,1])
+    k=1
+    for x,y in find_traps_for_params(p,k):
+        print("solutions is ({},{}):".format(x,y))
+        print("\n\n")        
+
 
 if __name__ == "__main__":
     main()
