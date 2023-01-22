@@ -82,16 +82,21 @@ def find_traps_for_params(p : Polynomial, k: int):
 #TODO: Iterate p
 #TODO: Add test for size
 
+
+from plot_traps import *
+
+
 def main():
     #p(y)/p(x)=(y/x)^(m+k+2) => x^(m+k+2)*p(y)-y^(m+k+2)*p(x)=0
     #print_new_roots(a=1.0/np.pi, k = 2, m=8)
     #print_edges_of_curve(k=1, m = 8)
     #plot_g_around_zero(k=1, m = 8)
-    p=Polynomial([1,1,1])
-    k=1
-    for x,y in find_traps_for_params(p,k):
-        print("solutions is ({},{}):".format(x,y))
-        print("\n\n")        
+    # p=Polynomial([1,1,1])
+    # k=1
+    # for x,y in find_traps_for_params(p,k):
+    #     print("solutions is ({},{}):".format(x,y))
+    #     print("\n\n")        
+    plot_curves(1,5)
 
 
 if __name__ == "__main__":
