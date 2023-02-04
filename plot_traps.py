@@ -39,6 +39,8 @@ def is_tp_below(x : float, y: float, p : Polynomial, k : int, m = None) -> bool:
     """
     if m is None:
         m=p.degree()+1
+    if x == 1 or y==1:
+        return False
     is_coord_below = lambda a: 2*p(a)<a**m * (a-2*a**(k+1))/(1-a)
     return is_coord_below(x) and is_coord_below(y)
 
@@ -93,8 +95,8 @@ def filter_traps_only(plot, p : Polynomial, k : int) -> Iterable[typing.Tuple[fl
         for x,y in v:
             if np.isclose(x,y):
                 continue
-            if x*y >= 0.5:
-                continue
+            #if x*y >= 0.5:
+            #    continue
             if not is_tp_below(x,y, p, k+1):
                 continue
             #These points are potential traps but maybe there is no direction to make t_p above P_k
@@ -115,7 +117,7 @@ def fill_trivial_part(ax, num_pts = 100):
     ax.fill_between(xs, 1, ys, where=ys<1, color='#969696')
 
 
-def plot_curves(k :int, m: int, num_pts = 600):
+def plot_curves(max_k :int, max_m: int, num_pts = 600):
     """
     Plots all the curves that satisfy the condition
     s_(t_p)=s_(P_k)
@@ -126,29 +128,33 @@ def plot_curves(k :int, m: int, num_pts = 600):
     (i.e. there is a perturbation direction of the parameter for which we get traps)
 
     Note: The text output of this function is to be read by a
-    yet-to-be-written C++ program that plots all these points on
+    C++ program that plots all these points on
     a given image (to represent the curves on the image of N)
 
     Args:
-        k (int): The index of the vertices in the description
+        max_k (int): The maximal index of the vertices in the description
         the line we test is P_k=[pi(p^k m^inf), pi(p^{k+1} m^inf)]
-        m (int): The length of the words with the trap
+        max_m (int): The maximal length of the words with the trap
         the vector t_p is (2x^{-m}p(x),2y^{-m}p(y)) where `p` is a degree `m-1` poynomial
         with coefficients {-1, 0, 1}
         num_pts (int, optional): Num of points to run the algorithm. Defaults to 600.
     """
     y, x = np.ogrid[0.5:1:num_pts*1j, 0.5:1:num_pts*1j]
-    fig, ax = plt.subplots(figsize=(6,6), dpi=100)
-    for p in iterate_possible_polynomials(m, iterate_possible_coefficients()):
-        curve_fn = generate_r(p, 1)
-        #Generate the points where `curve_fn=0`
-        res = ax.contour(x.ravel(), y.ravel(), curve_fn(x,y), [0], colors= [np.random.rand(3,)], linewidths=0.3)
-        # Filter actual trap points
-        for i, (a,b) in enumerate(filter_traps_only(res, p, k)):
-            if i == 0:
-                print("STOP")
-                pretty_print_polynomial(p)
-            print("{} {}".format(a,b)) 
+    fig, ax = plt.subplots(figsize=(1,1), dpi=600)
+    for p in iterate_possible_polynomials(max_m, iterate_possible_coefficients()):
+        for k in range(max_k):
+            curve_fn = generate_r(p, k)
+            #Generate the points where `curve_fn=0`
+            res = ax.contour(x.ravel(), y.ravel(), curve_fn(x,y), [0], colors= [np.random.rand(3,)], linewidths=0.3)
+            # Filter actual trap points based on other conditions
+            for i, (a,b) in enumerate(filter_traps_only(res, p, max_k)):
+                # Print header of polynomial + `k`
+                if i == 0:
+                    print("STOP")
+                    print(pretty_str_polynomial(p))
+                    print(k)
+                # Print all points on the crurve
+                print("{} {}".format(a,b)) 
     fill_trivial_part(ax, num_pts)
-    plt.axis('off')
-    plt.show()
+    #plt.axis('off')
+    #plt.show()

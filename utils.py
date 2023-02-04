@@ -32,7 +32,7 @@ def iterate_possible_polynomials(m : int,
     return map( lambda tup : Polynomial(list(tup)), 
     itertools.product(*args_to_product))
 
-def pretty_print_polynomial(poly : Polynomial) -> str:
+def pretty_str_polynomial(poly : Polynomial) -> str:
     """Print a polynomial with the '^' token for exponentiation
 
     Args:
