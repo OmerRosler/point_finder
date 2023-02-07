@@ -41,7 +41,7 @@ def is_tp_below(x : float, y: float, p : Polynomial, k : int, m = None) -> bool:
         m=p.degree()+1
     if x == 1 or y==1:
         return False
-    is_coord_below = lambda a: 2*p(a)<a**m * (a-2*a**(k+1))/(1-a)
+    is_coord_below = lambda a: 2*p(a)<a**(m+k+1)
     return is_coord_below(x) and is_coord_below(y)
 
 import typing
