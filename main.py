@@ -3,13 +3,17 @@ from plot_traps import *
 def plot_poynomial_CT_vectors(p: Polynomial, num_pts: int, abs_bound):
     coord_value = lambda x: x**(-p.degree()-1)*p(x)
     abs_bound = lambda x,y : x**4+y**4
-    vec = lambda x,y : coord_value(x)**2+coord_value(y)**2
+    vec = lambda vx,vy : vx**2+vy**2
 
     d = np.linspace(0.5,1,num_pts)
-    m = np.meshgrid(d,d)
-    x,y=m
+    x,y = np.meshgrid(d,d)
 
-    res =vec(x,y)<abs_bound(x,y)
+    vx = coord_value(x)
+    vy = coord_value(y)
+    slope = lambda vx,vy: vy/vx
+    
+
+    res =(vec(vx,vy)<abs_bound(x,y)) & (slope(vx,vy) > (y/x) ) & (slope(vx,vy) < (y/x)**3 )
 
     if np.all(res==False):
         return False
